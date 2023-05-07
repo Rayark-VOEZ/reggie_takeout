@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文件上传</title>
+  <!-- 引入样式 -->
+  <link rel="stylesheet" href="../../plugins/element-ui/index.css" />
+  <link rel="stylesheet" href="../../styles/common.css" />
+  <link rel="stylesheet" href="../../styles/page.css" />
+</head>
+<body>
+   <div class="addBrand-container" id="food-add-app">
+    <div class="container">
+        <!--
+        el-upload标签：文件上传组件
+            属性：
+                重要属性：
+                    action：文件上传表单提交地址               eg：/common/upload
+                    name：上传的文件字段名 默认值为file
+                    on-success：文件上传成功时绑定的事件函数    eg：handleAvatarSuccess 表示文件上传调用该函数执行
+                        handleAvatarSuccess (response, file, fileList) {
+                              this.imageUrl = `/common/download?name=${response.data}`
+                        }
+                        1.文件上传成功后，为imageUrl赋值 给了一个网络地址 表示文件上传成功之后下载到本地进行预览显示
+                        2.文件上传成功后 服务器响应的数据文件名称
+                    before-upload：文件上传之前绑定的事件函数   eg：beforeUpload 表示在文件上传之间进行检查校验
+                了解属性：
+                    class：设置类样式
+                    show-file-list：设置是否显示文件上传列表    false：不显示
+                    ref：设置当前表单的引用 可以看作是给form表单起个名称  方法后面使用时找到它
+            数据模型：
+                imageUrl：上传成功的图片路径
+        -->
+        <el-upload class="avatar-uploader"
+                action="/common/upload"
+                :show-file-list="false"
+                :on-success="handleAvatarSuccess"
+                :before-upload="beforeUpload"
+                ref="upload">
+            <img v-if="imageUrl" :src="imageUrl" class="avatar"></img>
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+        </el-upload>
+    </div>
+  </div>
+    <!-- 开发环境版本，包含了有帮助的命令行警告 -->
+    <script src="../../plugins/vue/vue.js"></script>
+    <!-- 引入组件库 -->
+    <script src="../../plugins/element-ui/index.js"></script>
+    <!-- 引入axios -->
+    <script src="../../plugins/axios/axios.min.js"></script>
+    <script src="../../js/index.js"></script>
+    <script>
+      new Vue({
+        el: '#food-add-app',
+        data() {
+          return {
+            imageUrl: ''
+          }
+        },
+        methods: {
+          handleAvatarSuccess (response, file, fileList) {
+              this.imageUrl = `/common/download?name=${response.data}`
+          },
+          beforeUpload (file) {
+            if(file){ //eg 上传001.jpg
+              const suffix = file.name.split('.')[1]
+              const size = file.size / 1024 / 1024 < 2
+              if(['png','jpeg','jpg'].indexOf(suffix) < 0){
+                this.$message.error('上传图片只支持 png、jpeg、jpg 格式！')
+                this.$refs.upload.clearFiles()
+                return false
+              }
+              if(!size){
+                this.$message.error('上传文件大小不能超过 2MB!')
+                return false
+              }
+              return file
+            }
+          }
+        }
+      })
+    </script>
+</body>
+</html>
