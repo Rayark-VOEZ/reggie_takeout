@@ -25,12 +25,17 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
+    /**
+     * 用户登录
+     * @param session
+     * @param employee
+     * @return
+     * @throws NoSuchAlgorithmException
+     */
     @PostMapping("/login")
     public R<Object> login(HttpSession session, @RequestBody Employee employee) throws NoSuchAlgorithmException {
 
         // 1、将页面提交的密码password进行md5加密处理
-        // MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-        // byte[] digest = messageDigest.digest(employee.getPassword().getBytes(StandardCharsets.UTF_8));
         String md5 = DigestUtils.md5DigestAsHex(employee.getPassword().getBytes(StandardCharsets.UTF_8));
 
         // 2、根据页面提交的用户名username查询数据库
@@ -58,6 +63,11 @@ public class EmployeeController {
         return R.success(e);
     }
 
+    /**
+     * 用户登出
+     * @param session 会话
+     * @return
+     */
     @PostMapping("/logout")
     public R<Object> logout(HttpSession session) {
 
@@ -69,23 +79,14 @@ public class EmployeeController {
     }
 
     /**
-     * 新增用户
-     * @param request
+     * 新增员工
      * @param employee
      * @return
      */
     @PostMapping
-    public R<Object> save(HttpServletRequest request, @RequestBody Employee employee) {
+    public R<Object> save(@RequestBody Employee employee) {
 
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes(StandardCharsets.UTF_8)));
-
-        // employee.setCreateTime(LocalDateTime.now());
-        // employee.setUpdateTime(LocalDateTime.now());
-        //
-        // Long userId = (Long) request.getSession().getAttribute("userId");
-        //
-        // employee.setCreateUser(userId);
-        // employee.setUpdateUser(userId);
 
         try {
             employeeService.save(employee);
@@ -99,7 +100,7 @@ public class EmployeeController {
 
 
     /**
-     * 分页
+     * 员工分页查询
      * @param page
      * @param pageSize
      * @param name
@@ -133,16 +134,13 @@ public class EmployeeController {
 
         Long userId = (Long) request.getSession().getAttribute("userId");
 
-        // employee.setUpdateUser(userId);
-        // employee.setUpdateTime(LocalDateTime.now());
-
         employeeService.updateById(employee);
 
         return R.success("修改成功");
     }
 
     /**
-     * 修改密码
+     * 修改员工密码
      * @return
      */
     @PutMapping("/updatePassword")
@@ -157,6 +155,8 @@ public class EmployeeController {
      */
     @GetMapping("/{id}")
     public R<Object> getById(@PathVariable Long id) {
+
+        log.info("========== 根据id查询员工信息 ==========");
 
         Employee employee = employeeService.getById(id);
 
@@ -176,7 +176,7 @@ public class EmployeeController {
     }
 
     /**
-     * 删除用户
+     * 删除员工
      * @return
      */
     @DeleteMapping

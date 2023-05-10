@@ -25,8 +25,6 @@ public class CategoryController {
     @PostMapping
     public R<Object> save(@RequestBody Category category) {
 
-        log.info("category: {}", category);
-
         try {
             categoryService.save(category);
         } catch (Exception e) {
@@ -37,13 +35,13 @@ public class CategoryController {
     }
 
     /**
-     * 分页
-     * @param page
-     * @param pageSize
+     * 分页查询分类
+     * @param page 当前页数
+     * @param pageSize 分页大小
      * @return
      */
     @GetMapping("/page")
-    public R<Object> page(int page, int pageSize) {
+    public R<Page<Category>> page(int page, int pageSize) {
 
         // 分页构造器
         Page<Category> pageInfo = new Page<>(page, pageSize);
@@ -74,40 +72,45 @@ public class CategoryController {
     }
 
     /**
-     * 列表
+     * 查询分类列表
      * @return
      */
     @GetMapping("/list")
     public R<Object> queryByList(Category category) {
 
+        log.info("========== 查询分类列表 ==========");
+
         LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(null != (category.getType()), Category::getType, category.getType());
-        queryWrapper.orderByAsc(Category::getSort).orderByDesc(Category::getUpdateTime);
+        queryWrapper.eq(category.getType() != null, Category::getType, category.getType());
 
         return R.success(categoryService.list(queryWrapper));
     }
 
     /**
-     * 删除
+     * 删除分类
+     * @param ids 分类id
      * @return
      */
     @DeleteMapping
-    public R<Object> deleteCategory(Long ids) {
+    public R<String> deleteCategory(Long ids) {
 
-        Category category = new Category();
-        category.setId(ids);
-        category.setIsDeleted(1);
+        log.info("========== 删除分类 ==========");
 
-        return R.success(categoryService.updateById(category));
+        if (categoryService.removeById(ids)) {
+            return R.success("分类删除成功！");
+        }
+        else {
+            return R.error("分类删除失败！");
+        }
     }
 
     /**
      * 根据id查询分类信息
-     * @param id
-     * @return
+     * @param id 分类id
+     * @return R<Category>
      */
     @GetMapping("/{id}")
-    public R<Object> getById(@PathVariable Long id) {
+    public R<Category> getById(@PathVariable Long id) {
 
         return R.success(categoryService.getById(id));
     }

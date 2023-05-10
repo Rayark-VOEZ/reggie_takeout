@@ -4,52 +4,68 @@ package com.reggie.takeout.filter;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.reggie.takeout.common.BaseContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 public class LoginCheckFilter implements Filter {
+
+    private static final String[] EXCLUDE_PATHS = {
+            "/employee/login",
+            "/employee/logout",
+            "/backend/page/login/login.html",
+            "/front/page/login.html",
+            "/user/login",
+            "/user/logout",
+            "/user/sendMsg",
+            "/**/api/**",
+            "/**/images/**",
+            "/**/js/**",
+            "/**/plugins/**",
+            "/**/styles/**",
+            "/**/*.ico"
+    };
+    AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 
-        // chain.doFilter();
-
         // 1、获取本次请求的URI
-        String requestURL = httpServletRequest.getRequestURL().toString();
-        System.out.println(requestURL);
-        chain.doFilter(request, response);
+        String requestURI = httpServletRequest.getRequestURI();
+        log.info(requestURI);
 
         // 2、判断本次请求是否需要处理
-        // todo: 需要放行静态资源
-        // if (requestURL.contains("login") ||
-        //         requestURL.contains(".js") ||
-        //         requestURL.contains(".css") ||
-        //         requestURL.contains(".ico") ||
-        //         requestURL.contains(".ttf") ||
-        //         requestURL.contains(".woff") ||
-        //         requestURL.contains(".png")) {
-        //     // 3、如果不需要处理，则直接放行
-        //     System.out.println("请求放行");
-        //     chain.doFilter(request, response);
-        //     return;
-        // }
+
+        // 3、如果不需要处理，则直接放行
+        for (String path: EXCLUDE_PATHS) {
+            if (pathMatcher.match(path, requestURI)) {
+                chain.doFilter(request, response);
+                return;
+            }
+        }
 
         // 4、判断登录状态，如果已登录，则直接放行
-        // if (httpServletRequest.getSession().getAttribute("userId") != null) {
-        //
-        //     Long userId = (Long) ((HttpServletRequest) request).getSession().getAttribute("userId");
-        //     BaseContext.setCurrentId(userId);
-        //     System.out.println("请求放行");
-        //     chain.doFilter(request, response);
-        // }
+        if (httpServletRequest.getSession().getAttribute("userId") != null) {
+            Long userId = (Long) ((HttpServletRequest) request).getSession().getAttribute("userId");
+            BaseContext.setCurrentId(userId);
+            chain.doFilter(request, response);
+            return;
+        }
+
         // 5、如果未登录则返回未登录结果
-        // else {
-        //     httpServletResponse.getWriter().write("未登录");
-        // }
-        // System.out.println("请求拦截");
+        if (requestURI.contains("/front")) {
+            httpServletResponse.sendRedirect("/front/page/login.html");
+        }
+        if (requestURI.contains("/backend")) {
+            httpServletResponse.sendRedirect("/backend/page/login/login.html");
+        }
     }
 }

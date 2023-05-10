@@ -1,5 +1,7 @@
 package com.reggie.takeout.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -19,7 +21,11 @@ public class ShoppingCart implements Serializable {
     //名称
     private String name;
 
+    //图片
+    private String image;
+
     //用户id
+    @TableField(fill = FieldFill.INSERT)
     private Long userId;
 
     //菜品id
@@ -36,9 +42,6 @@ public class ShoppingCart implements Serializable {
 
     //金额
     private BigDecimal amount;
-
-    //图片
-    private String image;
 
     private LocalDateTime createTime;
 }

@@ -8,5 +8,6 @@ import com.reggie.takeout.entity.Dish;
 public interface DishService extends IService<Dish> {
 
     void saveWithFlavor(DishDto dishDto);
+    void updateWithFlavor(DishDto dishDto);
     DishDto getByIdWithFlavour(Long id);
 }
