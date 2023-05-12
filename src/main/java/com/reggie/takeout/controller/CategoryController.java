@@ -18,12 +18,14 @@ public class CategoryController {
     private CategoryService categoryService;
 
     /**
-     * 新增分类
-     * @param category
+     * 新增Category
+     * @param category 表单
      * @return
      */
     @PostMapping
-    public R<Object> save(@RequestBody Category category) {
+    public R<Object> saveCategory(@RequestBody Category category) {
+
+        log.info("========== 新增Category ==========");
 
         try {
             categoryService.save(category);
@@ -41,7 +43,9 @@ public class CategoryController {
      * @return
      */
     @GetMapping("/page")
-    public R<Page<Category>> page(int page, int pageSize) {
+    public R<Page<Category>> queryByPage(int page, int pageSize) {
+
+        log.info("========== 分页查询Category ==========");
 
         // 分页构造器
         Page<Category> pageInfo = new Page<>(page, pageSize);
@@ -64,11 +68,16 @@ public class CategoryController {
      * @return
      */
     @PutMapping
-    public R<Object> update(@RequestBody Category category) {
+    public R<Object> updateCategory(@RequestBody Category category) {
 
-        categoryService.updateById(category);
+        log.info("========== 更新Category ==========");
 
-        return R.success("修改成功！");
+        if (categoryService.updateById(category)) {
+            return R.success("修改成功！");
+        }
+        else {
+            return R.error("修改失败！");
+        }
     }
 
     /**
@@ -94,7 +103,7 @@ public class CategoryController {
     @DeleteMapping
     public R<String> deleteCategory(Long ids) {
 
-        log.info("========== 删除分类 ==========");
+        log.info("========== 删除Category ==========");
 
         if (categoryService.removeById(ids)) {
             return R.success("分类删除成功！");

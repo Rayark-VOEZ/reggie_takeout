@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class MyMetaObjectHandler implements MetaObjectHandler {
 
     /**
-     *
+     * 插入填充
      * @param metaObject
      */
     @Override
@@ -21,6 +21,10 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
         metaObject.setValue("updateUser", BaseContext.getCurrentId());
     }
 
+    /**
+     * 更新填充
+     * @param metaObject
+     */
     @Override
     public void updateFill(MetaObject metaObject) {
         metaObject.setValue("updateTime", LocalDateTime.now());

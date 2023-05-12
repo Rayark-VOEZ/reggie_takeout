@@ -1,6 +1,5 @@
 package com.reggie.takeout.filter;
 
-
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,11 +11,14 @@ import org.springframework.util.AntPathMatcher;
 
 import java.io.IOException;
 
+/**
+ * 登录过滤器
+ */
 @Slf4j
 @Component
-public class LoginCheckFilter implements Filter {
+public class LoginFilter implements Filter {
 
-    private static final String[] EXCLUDE_PATHS = {
+    private static final String[] EXCLUDE_PATHS = { // 排除过滤路径
             "/employee/login",
             "/employee/logout",
             "/backend/page/login/login.html",
@@ -31,10 +33,11 @@ public class LoginCheckFilter implements Filter {
             "/**/styles/**",
             "/**/*.ico"
     };
-    AntPathMatcher pathMatcher = new AntPathMatcher();
+    private AntPathMatcher pathMatcher = new AntPathMatcher(); // 路径匹配器
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 
@@ -43,7 +46,6 @@ public class LoginCheckFilter implements Filter {
         log.info(requestURI);
 
         // 2、判断本次请求是否需要处理
-
         // 3、如果不需要处理，则直接放行
         for (String path: EXCLUDE_PATHS) {
             if (pathMatcher.match(path, requestURI)) {
@@ -62,10 +64,10 @@ public class LoginCheckFilter implements Filter {
 
         // 5、如果未登录则返回未登录结果
         if (requestURI.contains("/front")) {
-            httpServletResponse.sendRedirect("/front/page/login.html");
+            httpServletResponse.sendRedirect("/front/page/login.html"); // 重定向
         }
         if (requestURI.contains("/backend")) {
-            httpServletResponse.sendRedirect("/backend/page/login/login.html");
+            httpServletResponse.sendRedirect("/backend/page/login/login.html"); // 重定向
         }
     }
 }

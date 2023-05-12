@@ -25,7 +25,6 @@ public class ShoppingCart implements Serializable {
     private String image;
 
     //用户id
-    @TableField(fill = FieldFill.INSERT)
     private Long userId;
 
     //菜品id

@@ -23,7 +23,7 @@ public class CommonController {
 
     /**
      * 上传文件
-     * @param file
+     * @param file 上传的文件
      * @return
      */
     @PostMapping("/upload")
@@ -34,10 +34,10 @@ public class CommonController {
 
         String fileName = UUID.randomUUID() + suffix; // 生成新文件名
 
-        // 判断路径是否存在
+
         File dir = new File(BASE_PATH);
-        if (!dir.exists()) {
-            dir.mkdirs();
+        if (!dir.exists()) { // 如果路径不存在
+            dir.mkdirs(); // 创建路径
         }
 
         try {
@@ -52,17 +52,17 @@ public class CommonController {
     /**
      * 下载文件
      * @param response
-     * @param name
+     * @param name 文件名
      */
     @GetMapping("/download")
     public void download(HttpServletResponse response, String name) {
 
         try {
-            FileInputStream fileInputStream = new FileInputStream(BASE_PATH + name);
+            FileInputStream fileInputStream = new FileInputStream(BASE_PATH + name); // 获取文件字节输入流
 
             ServletOutputStream outputStream = response.getOutputStream();
 
-            response.setContentType("image/jpeg");
+            response.setContentType("image/jpeg"); // 设置响应类型为image/jpeg
 
             int len = 0;
             byte[] bytes = new byte[1024];
@@ -71,8 +71,8 @@ public class CommonController {
                 outputStream.flush();
             }
 
-            outputStream.close();
-            fileInputStream.close();
+            outputStream.close(); // 关闭输出流
+            fileInputStream.close(); // 关闭文件字节输入流
         } catch (Exception e) {
             e.printStackTrace();
         }

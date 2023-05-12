@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.reggie.takeout.common.R;
 import com.reggie.takeout.entity.User;
 import com.reggie.takeout.service.UserService;
-import com.reggie.takeout.util.SMSUtils;
 import com.reggie.takeout.util.ValidateCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,11 +34,14 @@ public class UserController {
      * @return
      */
     @PostMapping("/loginout")
-    public R<Object> logout() {
+    public R<Object> logout(HttpSession session) {
 
         log.info("========== 用户登出 ==========");
 
-        return null;
+        session.removeAttribute("userId"); // 从session中移除用户Id
+        session.invalidate();
+
+        return R.success("Success!");
     }
 
     /**
@@ -87,11 +89,11 @@ public class UserController {
 
         log.info("========== 发送验证码短信 ==========");
 
-        String phone = user.getPhone();
+        String phone = user.getPhone(); // 获取用户手机号
 
-        String code = ValidateCodeUtils.generateValidateCode(4).toString();
+        String code = ValidateCodeUtils.generateValidateCode(4).toString(); // 生成4位随机验证码
         // SMSUtils.sendMessage("菩提阁", "", phone, code);
-        session.setAttribute(phone, code);
+        session.setAttribute(phone, code); // 将验证码存入session
 
         return R.success(code);
     }
